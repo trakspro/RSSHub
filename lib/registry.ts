@@ -12,8 +12,6 @@ import robotstxt from '@/routes/robots.txt';
 import metrics from '@/routes/metrics';
 import logger from '@/utils/logger';
 
-const __dirname = import.meta.dirname;
-
 function isSafeRoutes(routes: RoutesType): boolean {
     return Object.values(routes).every((route: Route) => !route.features?.nsfw);
 }
@@ -67,7 +65,7 @@ switch (process.env.NODE_ENV) {
         break;
     default:
         modules = directoryImport({
-            targetDirectoryPath: path.join(__dirname, './routes'),
+            targetDirectoryPath: path.resolve('lib/routes'),
             importPattern: /\.ts$/,
         }) as typeof modules;
 }
@@ -166,7 +164,6 @@ const sortRoutes = (
             const segmentA = segmentsA[i];
             const segmentB = segmentsB[i];
 
-            // Literal segments have priority over parameter segments
             if (segmentA.startsWith(':') !== segmentB.startsWith(':')) {
                 return segmentA.startsWith(':') ? 1 : -1;
             }
@@ -245,7 +242,6 @@ app.get('/', index);
 app.get('/healthz', healthz);
 app.get('/robots.txt', robotstxt);
 if (config.debugInfo) {
-    // Only enable tracing in debug mode
     app.get('/metrics', metrics);
 }
 app.use(
